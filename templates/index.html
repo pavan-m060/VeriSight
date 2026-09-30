@@ -1,0 +1,996 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>VeriSight | Review Integrity</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: Arial, Helvetica, sans-serif;
+            background: #0b1120;
+            color: #f8fafc;
+        }
+
+        .container {
+            width: 92%;
+            max-width: 1050px;
+            margin: 0 auto;
+            padding: 40px 0 60px;
+        }
+
+        /* ================= HEADER ================= */
+
+        .header {
+            text-align: center;
+            margin-bottom: 35px;
+        }
+
+        .logo {
+            font-size: 46px;
+            font-weight: 800;
+            letter-spacing: -1px;
+        }
+
+        .logo span {
+            color: #38bdf8;
+        }
+
+        .subtitle {
+            color: #94a3b8;
+            margin-top: 8px;
+            font-size: 17px;
+        }
+
+        .status {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 15px;
+            padding: 7px 14px;
+            border-radius: 20px;
+            background: #132e23;
+            color: #86efac;
+            font-size: 13px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: #22c55e;
+            border-radius: 50%;
+        }
+
+        /* ================= CARD ================= */
+
+        .card {
+            background: #172238;
+            border: 1px solid #26344d;
+            border-radius: 18px;
+            padding: 30px;
+            margin-bottom: 24px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.20);
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        /* ================= INPUT ================= */
+
+        textarea {
+            width: 100%;
+            height: 180px;
+            resize: vertical;
+            border: 1px solid #334155;
+            border-radius: 12px;
+            padding: 16px;
+            font-size: 15px;
+            line-height: 1.6;
+            background: #0d1628;
+            color: white;
+            outline: none;
+        }
+
+        textarea:focus {
+            border-color: #38bdf8;
+            box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.15);
+        }
+
+        textarea::placeholder {
+            color: #64748b;
+        }
+
+        .input-row {
+            display: flex;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .input-group {
+            flex: 1;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 9px;
+            font-weight: 600;
+            color: #cbd5e1;
+        }
+
+        select {
+            width: 100%;
+            padding: 13px;
+            border: 1px solid #334155;
+            border-radius: 10px;
+            background: #0d1628;
+            color: white;
+            font-size: 15px;
+            outline: none;
+        }
+
+        button {
+            width: 100%;
+            margin-top: 22px;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            background: #38bdf8;
+            color: #082f49;
+            font-size: 16px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        button:hover {
+            background: #7dd3fc;
+            transform: translateY(-1px);
+        }
+
+        button:disabled {
+            opacity: 0.55;
+            cursor: wait;
+            transform: none;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 15px;
+            color: #94a3b8;
+        }
+
+        .error {
+            display: none;
+            margin-top: 15px;
+            padding: 13px;
+            border-radius: 9px;
+            background: #450a0a;
+            color: #fecaca;
+        }
+
+        /* ================= RESULT ================= */
+
+        .result {
+            display: none;
+        }
+
+        .result-header {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+
+        .result-header h2 {
+            margin: 0;
+            font-size: 25px;
+        }
+
+        .result-header p {
+            color: #64748b;
+            margin-top: 7px;
+        }
+
+        /* ================= PROBABILITY ================= */
+
+        .probability-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .probability-card {
+            background: #0d1628;
+            border: 1px solid #26344d;
+            border-radius: 13px;
+            padding: 22px;
+        }
+
+        .probability-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .probability-name {
+            color: #94a3b8;
+            font-size: 14px;
+        }
+
+        .probability-number {
+            font-size: 28px;
+            font-weight: 800;
+        }
+
+        .bar {
+            height: 9px;
+            background: #1e293b;
+            border-radius: 20px;
+            margin-top: 15px;
+            overflow: hidden;
+        }
+
+        .bar-fill {
+            height: 100%;
+            width: 0%;
+            border-radius: 20px;
+            transition: width 0.7s ease;
+        }
+
+        .ai-bar {
+            background: #a78bfa;
+        }
+
+        .spam-bar {
+            background: #f87171;
+        }
+
+        /* ================= CLASSIFICATION ================= */
+
+        .classification-box {
+            margin-top: 25px;
+            text-align: center;
+            padding: 28px;
+            border-radius: 14px;
+            background: #0d1628;
+            border: 1px solid #26344d;
+        }
+
+        .classification-label {
+            color: #64748b;
+            font-size: 13px;
+            letter-spacing: 1px;
+        }
+
+        .classification-value {
+            font-size: 32px;
+            font-weight: 800;
+            margin-top: 9px;
+        }
+
+        /* ================= RISK ================= */
+
+        .risk {
+            margin-top: 18px;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: 800;
+        }
+
+        .risk-low {
+            background: #14532d;
+            color: #86efac;
+        }
+
+        .risk-medium {
+            background: #713f12;
+            color: #fde68a;
+        }
+
+        .risk-high {
+            background: #7f1d1d;
+            color: #fca5a5;
+        }
+
+        /* ================= SIGNALS ================= */
+
+        .signals {
+            margin-top: 28px;
+        }
+
+        .signals h3 {
+            margin-bottom: 13px;
+        }
+
+        .signal {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #0d1628;
+            border: 1px solid #26344d;
+            padding: 14px;
+            border-radius: 9px;
+            margin-top: 9px;
+            color: #cbd5e1;
+        }
+
+        .signal-icon {
+            font-size: 18px;
+        }
+
+        /* ================= FOUR CLASS ================= */
+
+        .classification-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-top: 25px;
+        }
+
+        .class-card {
+            text-align: center;
+            padding: 14px 8px;
+            border-radius: 9px;
+            background: #0d1628;
+            color: #64748b;
+            font-size: 12px;
+            border: 1px solid #26344d;
+        }
+
+        .class-card.active {
+            border-color: #38bdf8;
+            color: #f8fafc;
+            background: #10283a;
+        }
+
+        /* ================= FOOTER ================= */
+
+        .footer {
+            text-align: center;
+            color: #475569;
+            font-size: 12px;
+            margin-top: 25px;
+        }
+
+        /* ================= MOBILE ================= */
+
+        @media (max-width: 700px) {
+
+            .container {
+                width: 94%;
+                padding-top: 25px;
+            }
+
+            .logo {
+                font-size: 36px;
+            }
+
+            .input-row {
+                flex-direction: column;
+            }
+
+            .probability-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .classification-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .card {
+                padding: 20px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+<div class="container">
+
+    <!-- HEADER -->
+
+    <div class="header">
+
+        <div class="logo">
+            Veri<span>Sight</span>
+        </div>
+
+        <div class="subtitle">
+            AI-Generated & Spam Review Detection
+        </div>
+
+        <div class="status">
+            <div class="status-dot"></div>
+            Detection Engine Online
+        </div>
+
+    </div>
+
+
+    <!-- INPUT -->
+
+    <div class="card">
+
+        <div class="section-title">
+            Analyze a Review
+        </div>
+
+        <label for="review">
+            Review Text
+        </label>
+
+        <textarea
+            id="review"
+            placeholder="Paste or type the review you want to analyze..."
+        ></textarea>
+
+
+        <div class="input-row">
+
+            <div class="input-group">
+
+                <label for="rating">
+                    Rating
+                </label>
+
+                <select id="rating">
+
+                    <option value="5">
+                        ★★★★★ — 5
+                    </option>
+
+                    <option value="4">
+                        ★★★★☆ — 4
+                    </option>
+
+                    <option value="3">
+                        ★★★☆☆ — 3
+                    </option>
+
+                    <option value="2">
+                        ★★☆☆☆ — 2
+                    </option>
+
+                    <option value="1">
+                        ★☆☆☆☆ — 1
+                    </option>
+
+                </select>
+
+            </div>
+
+        </div>
+
+
+        <button
+            id="analyzeButton"
+            onclick="analyzeReview()"
+        >
+            ANALYZE REVIEW
+        </button>
+
+
+        <div
+            id="loading"
+            class="loading"
+        >
+            🔍 Analyzing review with VeriSight...
+        </div>
+
+
+        <div
+            id="error"
+            class="error"
+        ></div>
+
+    </div>
+
+
+    <!-- RESULT -->
+
+    <div
+        id="result"
+        class="card result"
+    >
+
+        <div class="result-header">
+
+            <h2>
+                Analysis Result
+            </h2>
+
+            <p>
+                Multi-stage review integrity analysis
+            </p>
+
+        </div>
+
+
+        <!-- PROBABILITIES -->
+
+        <div class="probability-grid">
+
+            <div class="probability-card">
+
+                <div class="probability-top">
+
+                    <div class="probability-name">
+                        AI Generation Probability
+                    </div>
+
+                    <div
+                        id="aiProbability"
+                        class="probability-number"
+                    >
+                        0%
+                    </div>
+
+                </div>
+
+                <div class="bar">
+                    <div
+                        id="aiBar"
+                        class="bar-fill ai-bar"
+                    ></div>
+                </div>
+
+            </div>
+
+
+            <div class="probability-card">
+
+                <div class="probability-top">
+
+                    <div class="probability-name">
+                        Spam Probability
+                    </div>
+
+                    <div
+                        id="spamProbability"
+                        class="probability-number"
+                    >
+                        0%
+                    </div>
+
+                </div>
+
+                <div class="bar">
+                    <div
+                        id="spamBar"
+                        class="bar-fill spam-bar"
+                    ></div>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- FOUR CLASS OVERVIEW -->
+
+        <div class="classification-grid">
+
+            <div
+                id="humanGenuine"
+                class="class-card"
+            >
+                HUMAN<br>GENUINE
+            </div>
+
+            <div
+                id="humanSpam"
+                class="class-card"
+            >
+                HUMAN<br>SPAM
+            </div>
+
+            <div
+                id="aiGenuine"
+                class="class-card"
+            >
+                AI<br>GENUINE
+            </div>
+
+            <div
+                id="aiSpam"
+                class="class-card"
+            >
+                AI<br>SPAM
+            </div>
+
+        </div>
+
+
+        <!-- FINAL CLASSIFICATION -->
+
+        <div class="classification-box">
+
+            <div class="classification-label">
+                FINAL CLASSIFICATION
+            </div>
+
+            <div
+                id="classification"
+                class="classification-value"
+            >
+                -
+            </div>
+
+        </div>
+
+
+        <!-- RISK -->
+
+        <div
+            id="risk"
+            class="risk"
+        >
+            -
+        </div>
+
+
+        <!-- SIGNALS -->
+
+        <div class="signals">
+
+            <h3>
+                Detection Signals
+            </h3>
+
+
+            <div class="signal">
+
+                <span class="signal-icon">
+                    🤖
+                </span>
+
+                <span id="aiSignal">
+                    -
+                </span>
+
+            </div>
+
+
+            <div class="signal">
+
+                <span class="signal-icon">
+                    🛡️
+                </span>
+
+                <span id="spamSignal">
+                    -
+                </span>
+
+            </div>
+
+
+            <div class="signal">
+
+                <span class="signal-icon">
+                    ⭐
+                </span>
+
+                <span id="ratingSignal">
+                    -
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="footer">
+        VeriSight • Review Integrity Detection System
+    </div>
+
+</div>
+
+
+<script>
+
+async function analyzeReview() {
+
+    const review =
+        document.getElementById("review")
+        .value
+        .trim();
+
+    const rating =
+        parseInt(
+            document.getElementById("rating").value
+        );
+
+
+    const button =
+        document.getElementById(
+            "analyzeButton"
+        );
+
+    const loading =
+        document.getElementById(
+            "loading"
+        );
+
+    const error =
+        document.getElementById(
+            "error"
+        );
+
+    const result =
+        document.getElementById(
+            "result"
+        );
+
+
+    if (review.length < 5) {
+
+        error.style.display = "block";
+
+        error.innerText =
+            "Please enter a review with at least 5 characters.";
+
+        return;
+
+    }
+
+
+    error.style.display = "none";
+
+    result.style.display = "none";
+
+    loading.style.display = "block";
+
+    button.disabled = true;
+
+
+    try {
+
+        const response =
+            await fetch(
+                "/api/v1/analyze-review",
+                {
+
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body: JSON.stringify({
+
+                        review_text: review,
+
+                        rating: rating,
+
+                        /*
+                         * Current demonstration mode.
+                         * Stage 2 behavioral context is
+                         * supplied by the backend.
+                         */
+                        test_row_index: 0
+
+                    })
+
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                data.detail ||
+                "Analysis failed."
+            );
+
+        }
+
+
+        /* =========================
+           PROBABILITIES
+        ========================= */
+
+        const ai =
+            data.ai_probability * 100;
+
+        const spam =
+            data.spam_probability * 100;
+
+
+        document.getElementById(
+            "aiProbability"
+        ).innerText =
+            ai.toFixed(2) + "%";
+
+
+        document.getElementById(
+            "spamProbability"
+        ).innerText =
+            spam.toFixed(2) + "%";
+
+
+        document.getElementById(
+            "aiBar"
+        ).style.width =
+            ai + "%";
+
+
+        document.getElementById(
+            "spamBar"
+        ).style.width =
+            spam + "%";
+
+
+        /* =========================
+           CLASSIFICATION
+        ========================= */
+
+        const classification =
+            data.classification;
+
+
+        document.getElementById(
+            "classification"
+        ).innerText =
+            classification.replaceAll(
+                "_",
+                " "
+            );
+
+
+        /* =========================
+           HIGHLIGHT ACTIVE CLASS
+        ========================= */
+
+        document
+            .querySelectorAll(".class-card")
+            .forEach(card => {
+
+                card.classList.remove(
+                    "active"
+                );
+
+            });
+
+
+        const classMap = {
+
+            "HUMAN_GENUINE":
+                "humanGenuine",
+
+            "HUMAN_SPAM":
+                "humanSpam",
+
+            "AI_GENUINE":
+                "aiGenuine",
+
+            "AI_SPAM":
+                "aiSpam"
+
+        };
+
+
+        const activeCard =
+            document.getElementById(
+                classMap[classification]
+            );
+
+
+        if (activeCard) {
+
+            activeCard.classList.add(
+                "active"
+            );
+
+        }
+
+
+        /* =========================
+           RISK
+        ========================= */
+
+        const risk =
+            document.getElementById(
+                "risk"
+            );
+
+
+        risk.innerText =
+            "RISK LEVEL: " +
+            data.risk_level;
+
+
+        risk.className =
+            "risk risk-" +
+            data.risk_level.toLowerCase();
+
+
+        /* =========================
+           SIGNALS
+        ========================= */
+
+        document.getElementById(
+            "aiSignal"
+        ).innerText =
+            data.signals.ai_detection;
+
+
+        document.getElementById(
+            "spamSignal"
+        ).innerText =
+            data.signals.spam_detection;
+
+
+        document.getElementById(
+            "ratingSignal"
+        ).innerText =
+            data.signals.rating_text_consistency;
+
+
+        /* =========================
+           SHOW RESULT
+        ========================= */
+
+        result.style.display =
+            "block";
+
+
+        result.scrollIntoView({
+            behavior: "smooth"
+        });
+
+    }
+
+
+    catch (err) {
+
+        error.style.display =
+            "block";
+
+        error.innerText =
+            err.message;
+
+    }
+
+
+    finally {
+
+        loading.style.display =
+            "none";
+
+        button.disabled =
+            false;
+
+    }
+
+}
+
+</script>
+
+</body>
+
+</html>

@@ -1,0 +1,1 @@
+Ok, I just feel if you're paying well over $200 to have your website made, I'd try to make my own. The site has been built using React, Webpack and a bunch of other things that are not related to the core concepts of web development.

@@ -1,0 +1,34 @@
+=====================================
+VeriSight AI Review Generation Report
+=====================================
+
+Human Reviews : 20,500
+AI Reviews    : 20
+Failed        : 20,480
+
+Completion : 0.10%
+
+Rating Distribution
+rating
+1.0    4
+2.0    5
+3.0    6
+4.0    3
+5.0    2
+Name: count, dtype: int64
+
+Source Distribution
+source
+Yelp           9
+GooglePlay     5
+TripAdvisor    4
+Amazon         2
+Name: count, dtype: int64
+
+Category Distribution
+category
+Yelp           9
+GooglePlay     5
+TripAdvisor    4
+Amazon         2
+Name: count, dtype: int64

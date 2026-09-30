@@ -1,0 +1,87 @@
+# =========================
+# Python
+# =========================
+
+__pycache__/
+*.py[cod]
+*.pyo
+
+# =========================
+# Virtual environments
+# =========================
+
+venv/
+.venv/
+env/
+ENV/
+
+# =========================
+# Jupyter
+# =========================
+
+.ipynb_checkpoints/
+
+# =========================
+# IDE
+# =========================
+
+.vscode/
+.idea/
+
+# =========================
+# Environment / secrets
+# =========================
+
+.env
+.env.*
+*.key
+*.pem
+
+# =========================
+# Logs
+# =========================
+
+*.log
+
+# =========================
+# Large datasets
+# =========================
+
+data/**/*.csv
+data/**/*.zip
+data/**/*.mat
+data/**/*.json
+
+# Keep small documentation files
+!data/**/README.md
+
+# =========================
+# Large ML artifacts
+# =========================
+
+*.npy
+*.npz
+*.keras
+*.h5
+*.pkl
+*.joblib
+
+# =========================
+# Generated results
+# =========================
+
+results/**/*.csv
+results/**/*.json
+results/**/*.txt
+
+# =========================
+# Temporary files
+# =========================
+
+*.tmp
+*.temp
+*.bak
+
+# Windows
+Thumbs.db
+Desktop.ini

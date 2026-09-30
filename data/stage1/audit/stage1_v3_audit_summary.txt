@@ -1,0 +1,40 @@
+VERISIGHT STAGE 1 DATASET AUDIT
+======================================================================
+
+Original rows: 51540
+Balanced candidate rows: 21304
+
+LABEL DISTRIBUTION
+label
+0    20500
+1    31040
+Name: count, dtype: int64
+
+WORD COUNT STATISTICS
+       count    mean  median    std  min  max
+label                                        
+0      20500   72.03    57.0  52.31    8  273
+1      31040  101.52    96.0  33.06   20  441
+
+LENGTH DISTRIBUTION
+            Human     AI  Total    AI_%
+length_bin                             
+<20          1759      0   1759    0.00
+20-40        5339     95   5434    1.75
+41-60        3742   1164   4906   23.73
+61-80        2804   4475   7279   61.48
+81-100       2187  13228  15415   85.81
+101-120      1285   6834   8119   84.17
+121-150      1366   3389   4755   71.27
+151-200      1289   1274   2563   49.71
+201-300       729    477   1206   39.55
+301-450         0    104    104  100.00
+451+            0      0      0     NaN
+
+WORD COUNT ONLY BASELINE
+Accuracy: 79.38%
+
+
+DUPLICATES
+Duplicate rows: 0
+Cross-label duplicates: 0
