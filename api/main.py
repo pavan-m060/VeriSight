@@ -49,9 +49,9 @@ def analyze(request: ReviewRequest):
     try:
 
         result = analyze_review(
-            text=request.review_text,
+            review_text=request.review_text,
             rating=request.rating,
-            row_index=request.test_row_index or 0
+            mode=request.mode
         )
 
         return result

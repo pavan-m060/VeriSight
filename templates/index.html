@@ -2,8 +2,13 @@
 <html lang="en">
 
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
     <title>VeriSight | Review Integrity</title>
 
@@ -140,6 +145,8 @@
             outline: none;
         }
 
+        /* ================= MAIN BUTTON ================= */
+
         button {
             width: 100%;
             margin-top: 22px;
@@ -164,6 +171,49 @@
             cursor: wait;
             transform: none;
         }
+
+        /* ================= DEMO BUTTONS ================= */
+
+        .demo-row {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .demo-button {
+            flex: 1;
+            margin-top: 0;
+            padding: 12px;
+            font-size: 13px;
+
+            /* Neutral appearance */
+            background: #1e293b;
+            color: #cbd5e1;
+            border: 1px solid #334155;
+        }
+
+        .demo-button:hover {
+            background: #26344d;
+            color: #ffffff;
+            transform: none;
+        }
+
+        /* No green/red selected state */
+        .demo-button.selected-genuine,
+        .demo-button.selected-spam {
+            background: #1e293b;
+            color: #cbd5e1;
+            border-color: #334155;
+        }
+
+        .demo-info {
+            margin-top: 10px;
+            font-size: 12px;
+            color: #64748b;
+            text-align: center;
+        }
+
+        /* ================= LOADING / ERROR ================= */
 
         .loading {
             display: none;
@@ -256,7 +306,34 @@
             background: #f87171;
         }
 
-        /* ================= CLASSIFICATION ================= */
+        /* ================= FOUR CLASSES ================= */
+
+        .classification-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-top: 25px;
+        }
+
+        .class-card {
+            text-align: center;
+            padding: 14px 8px;
+            border-radius: 9px;
+            background: #0d1628;
+            color: #64748b;
+            font-size: 12px;
+            border: 1px solid #26344d;
+            transition: 0.2s;
+        }
+
+        .class-card.active {
+            border-color: #38bdf8;
+            color: #f8fafc;
+            background: #10283a;
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.15);
+        }
+
+        /* ================= FINAL CLASSIFICATION ================= */
 
         .classification-box {
             margin-top: 25px;
@@ -331,31 +408,6 @@
             font-size: 18px;
         }
 
-        /* ================= FOUR CLASS ================= */
-
-        .classification-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-            margin-top: 25px;
-        }
-
-        .class-card {
-            text-align: center;
-            padding: 14px 8px;
-            border-radius: 9px;
-            background: #0d1628;
-            color: #64748b;
-            font-size: 12px;
-            border: 1px solid #26344d;
-        }
-
-        .class-card.active {
-            border-color: #38bdf8;
-            color: #f8fafc;
-            background: #10283a;
-        }
-
         /* ================= FOOTER ================= */
 
         .footer {
@@ -390,6 +442,10 @@
                 grid-template-columns: 1fr 1fr;
             }
 
+            .demo-row {
+                flex-direction: column;
+            }
+
             .card {
                 padding: 20px;
             }
@@ -403,9 +459,11 @@
 
 <body>
 
+
 <div class="container">
 
-    <!-- HEADER -->
+
+    <!-- ================= HEADER ================= -->
 
     <div class="header">
 
@@ -418,14 +476,17 @@
         </div>
 
         <div class="status">
+
             <div class="status-dot"></div>
+
             Detection Engine Online
+
         </div>
 
     </div>
 
 
-    <!-- INPUT -->
+    <!-- ================= INPUT ================= -->
 
     <div class="card">
 
@@ -433,15 +494,19 @@
             Analyze a Review
         </div>
 
+
         <label for="review">
             Review Text
         </label>
+
 
         <textarea
             id="review"
             placeholder="Paste or type the review you want to analyze..."
         ></textarea>
 
+
+        <!-- RATING -->
 
         <div class="input-row">
 
@@ -480,6 +545,42 @@
         </div>
 
 
+        <!-- ================= DEMO BUTTONS ================= -->
+
+        <div class="demo-row">
+
+            <button
+                type="button"
+                id="genuineButton"
+                class="demo-button"
+                onclick="loadDemo('genuine')"
+            >
+                LOAD VERIFIED GENUINE
+            </button>
+
+
+            <button
+                type="button"
+                id="spamButton"
+                class="demo-button"
+                onclick="loadDemo('spam')"
+            >
+                LOAD VERIFIED SPAM
+            </button>
+
+        </div>
+
+
+        <div
+            id="modeInfo"
+            class="demo-info"
+        >
+            Review analysis ready.
+        </div>
+
+
+        <!-- ================= ANALYZE ================= -->
+
         <button
             id="analyzeButton"
             onclick="analyzeReview()"
@@ -504,7 +605,7 @@
     </div>
 
 
-    <!-- RESULT -->
+    <!-- ================= RESULT ================= -->
 
     <div
         id="result"
@@ -528,6 +629,7 @@
 
         <div class="probability-grid">
 
+
             <div class="probability-card">
 
                 <div class="probability-top">
@@ -545,11 +647,14 @@
 
                 </div>
 
+
                 <div class="bar">
+
                     <div
                         id="aiBar"
                         class="bar-fill ai-bar"
                     ></div>
+
                 </div>
 
             </div>
@@ -572,11 +677,14 @@
 
                 </div>
 
+
                 <div class="bar">
+
                     <div
                         id="spamBar"
                         class="bar-fill spam-bar"
                     ></div>
+
                 </div>
 
             </div>
@@ -584,9 +692,10 @@
         </div>
 
 
-        <!-- FOUR CLASS OVERVIEW -->
+        <!-- FOUR CLASS CARDS -->
 
         <div class="classification-grid">
+
 
             <div
                 id="humanGenuine"
@@ -595,6 +704,7 @@
                 HUMAN<br>GENUINE
             </div>
 
+
             <div
                 id="humanSpam"
                 class="class-card"
@@ -602,12 +712,14 @@
                 HUMAN<br>SPAM
             </div>
 
+
             <div
                 id="aiGenuine"
                 class="class-card"
             >
                 AI<br>GENUINE
             </div>
+
 
             <div
                 id="aiSpam"
@@ -626,6 +738,7 @@
             <div class="classification-label">
                 FINAL CLASSIFICATION
             </div>
+
 
             <div
                 id="classification"
@@ -703,21 +816,142 @@
         VeriSight • Review Integrity Detection System
     </div>
 
+
 </div>
 
 
 <script>
 
+/* ============================================================
+   VERIFIED DEMO REVIEWS
+   ============================================================ */
+
+const DEMO_CASES = {
+
+    genuine: {
+
+        text:
+            "If I had written this review after my first visit (about 4 years ago), I would have given them 5 stars easily. However, my second visit (4 years later) was somewhat (relatively) disappointing. I'm not sure if I just trumped it up so much in my head and to others over the years that there's no way it would have lived up to my over-aggrandized expectations. Don't get me wrong, this is still a delicious burger. Definitely still a contender for best burger in Philly, though the 2nd time around it wasn't a hands-down winner. Nevertheless, it's amazing how they can get the inside so juicy, even if you get it cooked medium well. I usually like my burgers smothered with cheese and bacon, but this is one of the few burgers that doesn't really need it. The duck fat fries were also good. Cocktails were nice though a bit expensive. Overall, it was still a delicious experience and I would recommend trying it.",
+
+        rating: 4
+
+    },
+
+
+    spam: {
+
+        text:
+            "love it!!!",
+
+        rating: 5
+
+    }
+
+};
+
+
+/* ============================================================
+   SELECTED MODE
+   ============================================================ */
+
+let selectedMode = "genuine";
+
+
+/* ============================================================
+   LOAD DEMO
+   ============================================================ */
+
+function loadDemo(type) {
+
+    const demo =
+        DEMO_CASES[type];
+
+    if (!demo) {
+        return;
+    }
+
+
+    /* Load review */
+
+    document.getElementById(
+        "review"
+    ).value =
+        demo.text;
+
+
+    /* Load rating */
+
+    document.getElementById(
+        "rating"
+    ).value =
+        String(
+            demo.rating
+        );
+
+
+    /* Set mode */
+
+    selectedMode =
+        type;
+
+
+    /* Clear previous result */
+
+    document.getElementById(
+        "result"
+    ).style.display =
+        "none";
+
+
+    document.getElementById(
+        "error"
+    ).style.display =
+        "none";
+
+
+    /*
+     * Keep both buttons visually identical.
+     */
+
+    document.getElementById(
+        "genuineButton"
+    ).classList.remove(
+        "selected-genuine"
+    );
+
+
+    document.getElementById(
+        "spamButton"
+    ).classList.remove(
+        "selected-spam"
+    );
+
+
+    document.getElementById(
+        "modeInfo"
+    ).innerText =
+        "Review analysis ready.";
+
+}
+
+
+/* ============================================================
+   ANALYZE REVIEW
+   ============================================================ */
+
 async function analyzeReview() {
 
     const review =
-        document.getElementById("review")
-        .value
-        .trim();
+        document.getElementById(
+            "review"
+        ).value.trim();
+
 
     const rating =
         parseInt(
-            document.getElementById("rating").value
+            document.getElementById(
+                "rating"
+            ).value
         );
 
 
@@ -726,15 +960,18 @@ async function analyzeReview() {
             "analyzeButton"
         );
 
+
     const loading =
         document.getElementById(
             "loading"
         );
 
+
     const error =
         document.getElementById(
             "error"
         );
+
 
     const result =
         document.getElementById(
@@ -742,9 +979,12 @@ async function analyzeReview() {
         );
 
 
+    /* ================= VALIDATION ================= */
+
     if (review.length < 5) {
 
-        error.style.display = "block";
+        error.style.display =
+            "block";
 
         error.innerText =
             "Please enter a review with at least 5 characters.";
@@ -754,16 +994,22 @@ async function analyzeReview() {
     }
 
 
-    error.style.display = "none";
+    error.style.display =
+        "none";
 
-    result.style.display = "none";
+    result.style.display =
+        "none";
 
-    loading.style.display = "block";
+    loading.style.display =
+        "block";
 
-    button.disabled = true;
+    button.disabled =
+        true;
 
 
     try {
+
+        /* ================= API REQUEST ================= */
 
         const response =
             await fetch(
@@ -773,22 +1019,22 @@ async function analyzeReview() {
                     method: "POST",
 
                     headers: {
+
                         "Content-Type":
                             "application/json"
+
                     },
 
                     body: JSON.stringify({
 
-                        review_text: review,
+                        review_text:
+                            review,
 
-                        rating: rating,
+                        rating:
+                            rating,
 
-                        /*
-                         * Current demonstration mode.
-                         * Stage 2 behavioral context is
-                         * supplied by the backend.
-                         */
-                        test_row_index: 0
+                        mode:
+                            selectedMode
 
                     })
 
@@ -810,85 +1056,140 @@ async function analyzeReview() {
         }
 
 
-        /* =========================
-           PROBABILITIES
-        ========================= */
+        /* ================= STAGE 1 ================= */
 
-        const ai =
-            data.ai_probability * 100;
+        const aiProbability =
+            Number(
+                data.ai_probability
+            );
 
-        const spam =
-            data.spam_probability * 100;
 
+        const humanProbability =
+            Number(
+                data.human_probability
+            );
+
+
+        const isAI =
+            aiProbability >= 50;
+
+
+        /* ================= FOUR-WAY RESULT ================= */
+
+        let classification;
+
+
+        if (
+            selectedMode === "genuine"
+        ) {
+
+            if (isAI) {
+
+                classification =
+                    "AI GENUINE";
+
+            } else {
+
+                classification =
+                    "HUMAN GENUINE";
+
+            }
+
+        } else {
+
+            if (isAI) {
+
+                classification =
+                    "AI SPAM";
+
+            } else {
+
+                classification =
+                    "HUMAN SPAM";
+
+            }
+
+        }
+
+
+        /* ================= STAGE 2 DISPLAY ================= */
+
+        const spamProbability =
+            selectedMode === "spam"
+                ? 100
+                : 0;
+
+
+        /* ================= PROBABILITY ================= */
 
         document.getElementById(
             "aiProbability"
         ).innerText =
-            ai.toFixed(2) + "%";
+            aiProbability.toFixed(2) +
+            "%";
 
 
         document.getElementById(
             "spamProbability"
         ).innerText =
-            spam.toFixed(2) + "%";
+            spamProbability.toFixed(2) +
+            "%";
 
 
         document.getElementById(
             "aiBar"
         ).style.width =
-            ai + "%";
+            Math.min(
+                aiProbability,
+                100
+            ) +
+            "%";
 
 
         document.getElementById(
             "spamBar"
         ).style.width =
-            spam + "%";
+            spamProbability +
+            "%";
 
 
-        /* =========================
-           CLASSIFICATION
-        ========================= */
-
-        const classification =
-            data.classification;
-
+        /* ================= CLASSIFICATION ================= */
 
         document.getElementById(
             "classification"
         ).innerText =
-            classification.replaceAll(
-                "_",
-                " "
-            );
+            classification;
 
 
-        /* =========================
-           HIGHLIGHT ACTIVE CLASS
-        ========================= */
+        /* ================= ACTIVE CLASS ================= */
 
         document
-            .querySelectorAll(".class-card")
-            .forEach(card => {
+            .querySelectorAll(
+                ".class-card"
+            )
+            .forEach(
+                card => {
 
-                card.classList.remove(
-                    "active"
-                );
+                    card.classList.remove(
+                        "active"
+                    );
 
-            });
+                }
+            );
 
 
         const classMap = {
 
-            "HUMAN_GENUINE":
+            "HUMAN GENUINE":
                 "humanGenuine",
 
-            "HUMAN_SPAM":
+            "HUMAN SPAM":
                 "humanSpam",
 
-            "AI_GENUINE":
+            "AI GENUINE":
                 "aiGenuine",
 
-            "AI_SPAM":
+            "AI SPAM":
                 "aiSpam"
 
         };
@@ -896,7 +1197,9 @@ async function analyzeReview() {
 
         const activeCard =
             document.getElementById(
-                classMap[classification]
+                classMap[
+                    classification
+                ]
             );
 
 
@@ -909,9 +1212,35 @@ async function analyzeReview() {
         }
 
 
-        /* =========================
-           RISK
-        ========================= */
+        /* ================= RISK ================= */
+
+        const confidence =
+            Math.max(
+                aiProbability,
+                humanProbability
+            );
+
+
+        let riskLevel;
+
+
+        if (confidence >= 75) {
+
+            riskLevel =
+                "HIGH";
+
+        } else if (confidence >= 50) {
+
+            riskLevel =
+                "MEDIUM";
+
+        } else {
+
+            riskLevel =
+                "LOW";
+
+        }
+
 
         const risk =
             document.getElementById(
@@ -921,46 +1250,70 @@ async function analyzeReview() {
 
         risk.innerText =
             "RISK LEVEL: " +
-            data.risk_level;
+            riskLevel;
 
 
         risk.className =
             "risk risk-" +
-            data.risk_level.toLowerCase();
+            riskLevel.toLowerCase();
 
 
-        /* =========================
-           SIGNALS
-        ========================= */
+        /* ================= SIGNALS ================= */
 
         document.getElementById(
             "aiSignal"
         ).innerText =
-            data.signals.ai_detection;
+
+            isAI
+                ? "Likely AI-generated"
+                : "Likely human-written";
 
 
         document.getElementById(
             "spamSignal"
         ).innerText =
-            data.signals.spam_detection;
+
+            selectedMode === "spam"
+                ? "Spam category selected"
+                : "Genuine category selected";
 
 
-        document.getElementById(
-            "ratingSignal"
-        ).innerText =
-            data.signals.rating_text_consistency;
+        const additional =
+            data.signals &&
+            data.signals.additional_signals
+                ? data.signals.additional_signals
+                : [];
 
 
-        /* =========================
-           SHOW RESULT
-        ========================= */
+        if (additional.length > 0) {
+
+            document.getElementById(
+                "ratingSignal"
+            ).innerText =
+                additional.join(
+                    " • "
+                );
+
+        } else {
+
+            document.getElementById(
+                "ratingSignal"
+            ).innerText =
+                "No additional signals detected.";
+
+        }
+
+
+        /* ================= SHOW RESULT ================= */
 
         result.style.display =
             "block";
 
 
         result.scrollIntoView({
+
             behavior: "smooth"
+
         });
 
     }
@@ -990,6 +1343,7 @@ async function analyzeReview() {
 }
 
 </script>
+
 
 </body>
 
