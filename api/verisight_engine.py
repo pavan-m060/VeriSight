@@ -1,9 +1,11 @@
 from pathlib import Path
+import json
 import re
 import string
 
 import joblib
 import numpy as np
+import pandas as pd
 
 from sentence_transformers import SentenceTransformer
 from tensorflow.keras.models import load_model
@@ -25,14 +27,21 @@ STAGE2_MODEL = (
     BASE_DIR
     / "models"
     / "stage2"
-    / "stage2_hybrid_stronger.keras"
+    / "stage2_page_model.pkl"
 )
 
 STAGE2_SCALER = (
     BASE_DIR
     / "models"
     / "stage2"
-    / "stage2_hybrid_stronger_scaler.pkl"
+    / "stage2_page_scaler.pkl"
+)
+
+STAGE2_FEATURES = (
+    BASE_DIR
+    / "models"
+    / "stage2"
+    / "stage2_page_features.txt"
 )
 
 
@@ -50,13 +59,26 @@ stage1_model = load_model(
     STAGE1_MODEL
 )
 
-stage2_model = load_model(
+stage2_model = joblib.load(
     STAGE2_MODEL
 )
 
 stage2_scaler = joblib.load(
     STAGE2_SCALER
 )
+
+with open(
+    STAGE2_FEATURES,
+    "r",
+    encoding="utf-8"
+) as f:
+
+    STAGE2_FEATURE_NAMES = [
+        line.strip()
+        for line in f
+        if line.strip()
+    ]
+
 
 print("VeriSight models loaded successfully.")
 
@@ -72,7 +94,9 @@ POSITIVE_WORDS = {
     "happy", "enjoy", "enjoyed", "beautiful",
     "recommend", "recommended", "helpful",
     "comfortable", "fast", "easy", "worth",
-    "satisfied", "clean", "fresh"
+    "satisfied", "clean", "fresh", "quality",
+    "stylish", "authentic", "impressive",
+    "light", "lightweight"
 }
 
 
@@ -84,220 +108,365 @@ NEGATIVE_WORDS = {
     "waste", "useless", "cheap", "rude",
     "problem", "problems", "difficult",
     "expensive", "disgusting", "boring",
-    "fake"
+    "fake", "hard", "issue", "issues",
+    "return", "refund", "wrong",
+    "uncomfortable", "never", "not",
+    "don't"
 }
 
 
 # ============================================================
-# BUILD BEHAVIOR FEATURES
+# SENTIMENT
 # ============================================================
 
-def build_behavior_features(review_text, rating):
-
-    text = str(review_text).strip()
+def calculate_sentiment(text):
 
     words = re.findall(
         r"\b\w+\b",
-        text
+        str(text)
     )
 
-    word_count = len(words)
-
-    char_count = len(text)
-
-    avg_word_length = (
-        np.mean([len(w) for w in words])
-        if words
-        else 0.0
-    )
-
-    letters = [
-        c for c in text
-        if c.isalpha()
-    ]
-
-    uppercase_ratio = (
-        sum(c.isupper() for c in letters)
-        / len(letters)
-        if letters
-        else 0.0
-    )
-
-    punctuation_count = sum(
-        c in string.punctuation
-        for c in text
-    )
-
-    punctuation_ratio = (
-        punctuation_count
-        / max(char_count, 1)
-    )
-
-    exclamation_count = text.count("!")
-
-    question_count = text.count("?")
-
-    digit_count = sum(
-        c.isdigit()
-        for c in text
-    )
-
-    digit_ratio = (
-        digit_count
-        / max(char_count, 1)
-    )
-
-    lower_words = [
-        w.lower()
-        for w in words
-    ]
+    if not words:
+        return 0.0
 
     positive_count = sum(
-        w in POSITIVE_WORDS
-        for w in lower_words
+        word.lower() in POSITIVE_WORDS
+        for word in words
     )
 
     negative_count = sum(
-        w in NEGATIVE_WORDS
-        for w in lower_words
+        word.lower() in NEGATIVE_WORDS
+        for word in words
     )
 
-    positive_ratio = (
-        positive_count
-        / max(word_count, 1)
-    )
-
-    negative_ratio = (
+    return (
+        positive_count -
         negative_count
-        / max(word_count, 1)
-    )
-
-    sentiment_score = (
-        positive_count - negative_count
-    ) / max(word_count, 1)
-
-    expected_sentiment = (
-        float(rating) - 3.0
-    ) / 2.0
-
-    rating_sentiment_difference = abs(
-        expected_sentiment - sentiment_score
-    )
-
-    features = [
-
-        # 1-16
-        float(rating),
-        word_count,
-        char_count,
-        avg_word_length,
-        uppercase_ratio,
-        punctuation_count,
-        punctuation_ratio,
-        exclamation_count,
-        question_count,
-        digit_count,
-        digit_ratio,
-        positive_count,
-        negative_count,
-        positive_ratio,
-        negative_ratio,
-        sentiment_score,
-
-        # 17-22
-        0.0,
-        3.0,
-        0.0,
-        0.0,
-        3.0,
-        1.0,
-
-        # 23
-        rating_sentiment_difference,
-
-        # 24-32
-        0.0,
-        3.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-
-        # 33-40
-        0.0,
-        3.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0
-    ]
-
-    return np.array(
-        features,
-        dtype=np.float32
-    )
+    ) / len(words)
 
 
 # ============================================================
-# ANALYZE REVIEW
+# BUILD STAGE 2 FEATURES
 # ============================================================
 
-def analyze_review(
-    review_text,
-    rating,
-    mode="genuine"
+def build_page_features(reviews):
+
+    product_review_count = len(
+        reviews
+    )
+
+    five_star_count = sum(
+        1
+        for review in reviews
+        if float(
+            review.get("rating", 0)
+        ) == 5
+    )
+
+    one_star_count = sum(
+        1
+        for review in reviews
+        if float(
+            review.get("rating", 0)
+        ) == 1
+    )
+
+    five_star_ratio = (
+        five_star_count /
+        product_review_count
+        if product_review_count
+        else 0.0
+    )
+
+    one_star_ratio = (
+        one_star_count /
+        product_review_count
+        if product_review_count
+        else 0.0
+    )
+
+
+    # --------------------------------------------------------
+    # DATE COUNTS
+    # --------------------------------------------------------
+
+    date_counts = {}
+
+    for review in reviews:
+
+        date = review.get(
+            "date",
+            ""
+        )
+
+        date_counts[date] = (
+            date_counts.get(
+                date,
+                0
+            ) + 1
+        )
+
+
+    # --------------------------------------------------------
+    # DUPLICATE COUNTS
+    # --------------------------------------------------------
+
+    text_counts = {}
+
+    for review in reviews:
+
+        text = review.get(
+            "text",
+            ""
+        ).strip().lower()
+
+        text_counts[text] = (
+            text_counts.get(
+                text,
+                0
+            ) + 1
+        )
+
+
+    rows = []
+
+
+    # --------------------------------------------------------
+    # CREATE FEATURES FOR EACH REVIEW
+    # --------------------------------------------------------
+
+    for review in reviews:
+
+        text = str(
+            review.get(
+                "text",
+                ""
+            )
+        ).strip()
+
+        rating = float(
+            review.get(
+                "rating",
+                5.0
+            )
+        )
+
+
+        words = text.split()
+
+        word_count = len(words)
+
+        char_count = len(text)
+
+
+        avg_word_length = (
+
+            sum(
+                len(word)
+                for word in words
+            )
+            / word_count
+
+            if word_count
+
+            else 0.0
+        )
+
+
+        uppercase_ratio = (
+
+            sum(
+                char.isupper()
+                for char in text
+            )
+            / char_count
+
+            if char_count
+
+            else 0.0
+        )
+
+
+        punctuation_count = sum(
+
+            1
+
+            for char in text
+
+            if char in
+            ".,!?;:'\"-()[]{}"
+        )
+
+
+        exclamation_count = (
+            text.count("!")
+        )
+
+        question_count = (
+            text.count("?")
+        )
+
+
+        digit_ratio = (
+
+            sum(
+                char.isdigit()
+                for char in text
+            )
+            / char_count
+
+            if char_count
+
+            else 0.0
+        )
+
+
+        sentiment_score = (
+            calculate_sentiment(
+                text
+            )
+        )
+
+
+        rating_sentiment_difference = abs(
+
+            (rating / 5.0)
+            - sentiment_score
+        )
+
+
+        date = review.get(
+            "date",
+            ""
+        )
+
+
+        try:
+
+            review_date_ordinal = (
+                pd.Timestamp(
+                    date
+                ).toordinal()
+            )
+
+        except Exception:
+
+            review_date_ordinal = 0
+
+
+        reviews_same_date = (
+            date_counts.get(
+                date,
+                1
+            )
+        )
+
+
+        normalized_text = (
+            text.lower().strip()
+        )
+
+
+        duplicate_text_count = (
+            text_counts.get(
+                normalized_text,
+                1
+            )
+        )
+
+
+        is_duplicate_text = (
+
+            1
+
+            if duplicate_text_count > 1
+
+            else 0
+        )
+
+
+        rows.append([
+
+            rating,
+
+            word_count,
+
+            char_count,
+
+            avg_word_length,
+
+            uppercase_ratio,
+
+            punctuation_count,
+
+            exclamation_count,
+
+            question_count,
+
+            digit_ratio,
+
+            sentiment_score,
+
+            rating_sentiment_difference,
+
+            review_date_ordinal,
+
+            reviews_same_date,
+
+            product_review_count,
+
+            five_star_ratio,
+
+            one_star_ratio,
+
+            duplicate_text_count,
+
+            is_duplicate_text
+
+        ])
+
+
+    X = pd.DataFrame(
+        rows,
+        columns=STAGE2_FEATURE_NAMES
+    )
+
+
+    X = X.replace(
+        [np.inf, -np.inf],
+        np.nan
+    )
+
+    X = X.fillna(0)
+
+
+    return X
+
+
+# ============================================================
+# STAGE 1
+# ============================================================
+
+def predict_ai_probability(
+    review_text
 ):
-
-    review_text = str(
-        review_text
-    ).strip()
-
-    if not review_text:
-
-        raise ValueError(
-            "Review cannot be empty."
-        )
-
-
-    # ========================================================
-    # VALIDATE MODE
-    # ========================================================
-
-    mode = str(
-        mode
-    ).lower().strip()
-
-    if mode not in [
-        "genuine",
-        "spam"
-    ]:
-
-        raise ValueError(
-            "Mode must be 'genuine' or 'spam'."
-        )
-
-
-    # ========================================================
-    # STAGE 1
-    # HUMAN vs AI
-    # ========================================================
 
     embedding = encoder.encode(
         [review_text],
         convert_to_numpy=True
     )
 
-    ai_probability = float(
-        stage1_model.predict(
-            embedding,
-            verbose=0
-        )[0][0]
+
+    output = stage1_model.predict(
+        embedding,
+        verbose=0
     )
+
+
+    ai_probability = float(
+        output[0][0]
+    )
+
 
     ai_probability = float(
         np.clip(
@@ -307,177 +476,333 @@ def analyze_review(
         )
     )
 
-    human_probability = (
-        1.0 - ai_probability
+
+    return ai_probability
+
+
+# ============================================================
+# ANALYZE MULTIPLE AMAZON REVIEWS
+# ============================================================
+
+def analyze_amazon_reviews(
+    reviews
+):
+
+    if not reviews:
+
+        raise ValueError(
+            "No reviews were extracted from the page."
+        )
+
+
+    # ========================================================
+    # STAGE 2 FEATURES
+    # ========================================================
+
+    X_stage2 = build_page_features(
+        reviews
     )
 
 
-    # ========================================================
-    # STAGE 2
-    #
-    # DEMO MODE:
-    #
-    # GENUINE BUTTON -> GENUINE
-    # SPAM BUTTON    -> SPAM
-    # ========================================================
-
-    if mode == "genuine":
-
-        is_spam = False
-
-        spam_probability = 0.0
-
-        genuine_probability = 1.0
-
-    else:
-
-        is_spam = True
-
-        spam_probability = 1.0
-
-        genuine_probability = 0.0
-
-
-    # ========================================================
-    # STAGE 1 DECISION
-    # ========================================================
-
-    is_ai = (
-        ai_probability >= 0.50
+    X_scaled = stage2_scaler.transform(
+        X_stage2
     )
 
 
-    # ========================================================
-    # FOUR-WAY CLASSIFICATION
-    # ========================================================
-
-    if is_ai and not is_spam:
-
-        classification = "AI GENUINE"
-
-    elif not is_ai and not is_spam:
-
-        classification = "HUMAN GENUINE"
-
-    elif is_ai and is_spam:
-
-        classification = "AI SPAM"
-
-    else:
-
-        classification = "HUMAN SPAM"
-
-
-    # ========================================================
-    # RISK
-    # ========================================================
-
-    confidence = max(
-        ai_probability,
-        human_probability
+    spam_probabilities = (
+        stage2_model.predict_proba(
+            X_scaled
+        )[:, 1]
     )
 
-    if confidence >= 0.75:
 
-        risk_level = "HIGH"
+    STAGE2_THRESHOLD = 0.19
 
-    elif confidence >= 0.50:
 
-        risk_level = "MEDIUM"
-
-    else:
-
-        risk_level = "LOW"
+    results = []
 
 
     # ========================================================
-    # SIGNALS
+    # PROCESS EACH REVIEW
     # ========================================================
 
-    if is_ai:
+    for index, review in enumerate(
+        reviews
+    ):
 
-        ai_signal = (
-            "Likely AI-generated"
-        )
-
-    else:
-
-        ai_signal = (
-            "Likely human-written"
-        )
+        text = str(
+            review.get(
+                "text",
+                ""
+            )
+        ).strip()
 
 
-    if mode == "genuine":
+        # ----------------------------------------------------
+        # STAGE 1
+        # ----------------------------------------------------
 
-        spam_signal = (
-            "Genuine category selected"
-        )
-
-    else:
-
-        spam_signal = (
-            "Spam category selected"
+        ai_probability = (
+            predict_ai_probability(
+                text
+            )
         )
 
 
-    additional = []
-
-
-    if review_text.count("!") > 2:
-
-        additional.append(
-            "High use of exclamation marks"
+        human_probability = (
+            1.0 -
+            ai_probability
         )
 
 
-    if len(review_text.split()) < 8:
+        if ai_probability >= 0.50:
 
-        additional.append(
-            "Very short review"
+            author_class = "AI"
+
+        else:
+
+            author_class = "HUMAN"
+
+
+        # ----------------------------------------------------
+        # STAGE 2
+        # ----------------------------------------------------
+
+        spam_probability = float(
+            spam_probabilities[index]
         )
+
+
+        genuine_probability = (
+            1.0 -
+            spam_probability
+        )
+
+
+        if (
+            spam_probability
+            >= STAGE2_THRESHOLD
+        ):
+
+            integrity_class = "SPAM"
+
+        else:
+
+            integrity_class = "GENUINE"
+
+
+        # ----------------------------------------------------
+        # FOUR-WAY CLASS
+        # ----------------------------------------------------
+
+        classification = (
+            f"{author_class} "
+            f"{integrity_class}"
+        )
+
+
+        # ----------------------------------------------------
+        # RISK
+        # ----------------------------------------------------
+
+        risk_confidence = max(
+            ai_probability,
+            human_probability,
+            spam_probability,
+            genuine_probability
+        )
+
+
+        if risk_confidence >= 0.75:
+
+            risk_level = "HIGH"
+
+        elif risk_confidence >= 0.50:
+
+            risk_level = "MEDIUM"
+
+        else:
+
+            risk_level = "LOW"
+
+
+        # ----------------------------------------------------
+        # SIGNALS
+        # ----------------------------------------------------
+
+        if author_class == "AI":
+
+            ai_signal = (
+                "Likely AI-generated"
+            )
+
+        else:
+
+            ai_signal = (
+                "Likely human-written"
+            )
+
+
+        if integrity_class == "SPAM":
+
+            spam_signal = (
+                "Page-based spam indicators detected"
+            )
+
+        else:
+
+            spam_signal = (
+                "No strong page-based spam indicators"
+            )
+
+
+        additional_signals = []
+
+
+        if len(text.split()) < 8:
+
+            additional_signals.append(
+                "Very short review"
+            )
+
+
+        if text.count("!") > 2:
+
+            additional_signals.append(
+                "High use of exclamation marks"
+            )
+
+
+        if review.get(
+            "verified_purchase",
+            False
+        ):
+
+            additional_signals.append(
+                "Verified purchase"
+            )
+
+
+        results.append({
+
+            "review_number":
+                index + 1,
+
+            "rating":
+                review.get(
+                    "rating"
+                ),
+
+            "review_text":
+                text,
+
+            "date":
+                review.get(
+                    "date"
+                ),
+
+            "verified_purchase":
+                review.get(
+                    "verified_purchase",
+                    False
+                ),
+
+            "helpful_count":
+                review.get(
+                    "helpful_count",
+                    0
+                ),
+
+            "ai_probability":
+                round(
+                    ai_probability * 100,
+                    2
+                ),
+
+            "human_probability":
+                round(
+                    human_probability * 100,
+                    2
+                ),
+
+            "spam_probability":
+                round(
+                    spam_probability * 100,
+                    2
+                ),
+
+            "genuine_probability":
+                round(
+                    genuine_probability * 100,
+                    2
+                ),
+
+            "author_class":
+                author_class,
+
+            "integrity_class":
+                integrity_class,
+
+            "classification":
+                classification,
+
+            "risk_level":
+                risk_level,
+
+            "signals": {
+
+                "ai_signal":
+                    ai_signal,
+
+                "spam_signal":
+                    spam_signal,
+
+                "additional_signals":
+                    additional_signals
+            }
+        })
 
 
     # ========================================================
-    # FINAL RESPONSE
+    # SUMMARY
     # ========================================================
+
+    summary = {
+
+        "total_reviews":
+            len(results),
+
+        "human_reviews":
+            sum(
+                r["author_class"] == "HUMAN"
+                for r in results
+            ),
+
+        "ai_reviews":
+            sum(
+                r["author_class"] == "AI"
+                for r in results
+            ),
+
+        "genuine_reviews":
+            sum(
+                r["integrity_class"] == "GENUINE"
+                for r in results
+            ),
+
+        "spam_reviews":
+            sum(
+                r["integrity_class"] == "SPAM"
+                for r in results
+            )
+    }
+
 
     return {
 
-        "ai_probability": round(
-            ai_probability * 100,
-            2
-        ),
+        "reviews":
+            results,
 
-        "human_probability": round(
-            human_probability * 100,
-            2
-        ),
-
-        "spam_probability": round(
-            spam_probability * 100,
-            2
-        ),
-
-        "genuine_probability": round(
-            genuine_probability * 100,
-            2
-        ),
-
-        "classification":
-            classification,
-
-        "risk_level":
-            risk_level,
-
-        "signals": {
-
-            "ai_signal":
-                ai_signal,
-
-            "spam_signal":
-                spam_signal,
-
-            "additional_signals":
-                additional
-        }
+        "summary":
+            summary
     }

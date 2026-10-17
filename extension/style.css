@@ -1,0 +1,515 @@
+/* ============================================================
+   VERISIGHT — PREMIUM POPUP UI
+   ============================================================ */
+
+* {
+    box-sizing: border-box;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 430px;
+    min-width: 430px;
+    max-width: 430px;
+    background: #080b12;
+    color: #f5f7fb;
+    font-family: Inter, Arial, Helvetica, sans-serif;
+}
+
+body {
+    min-height: 100vh;
+}
+
+.container {
+    min-height: 100vh;
+    padding: 18px;
+    background:
+        radial-gradient(circle at 15% 0%, rgba(99,102,241,.16), transparent 32%),
+        radial-gradient(circle at 100% 18%, rgba(139,92,246,.10), transparent 28%),
+        #080b12;
+}
+
+/* ========================= HEADER ========================= */
+
+.header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 17px;
+}
+
+.logo-box {
+    width: 46px;
+    height: 46px;
+    flex: 0 0 46px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 13px;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    box-shadow: 0 8px 24px rgba(99,102,241,.28);
+    color: white;
+    font-size: 23px;
+    font-weight: 900;
+}
+
+.header-text h1 {
+    margin: 0;
+    font-size: 21px;
+    font-weight: 800;
+    letter-spacing: -.3px;
+}
+
+.header-text p {
+    margin: 3px 0 0;
+    color: #8d96a8;
+    font-size: 11px;
+}
+
+/* ========================= SCAN ========================= */
+
+.scan-button {
+    width: 100%;
+    height: 44px;
+    border: 0;
+    border-radius: 11px;
+    background: linear-gradient(135deg, #6366f1, #7c3aed);
+    color: white;
+    font-size: 13px;
+    font-weight: 750;
+    cursor: pointer;
+    box-shadow: 0 8px 24px rgba(99,102,241,.20);
+    transition: .18s ease;
+}
+
+.scan-button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 11px 28px rgba(99,102,241,.30);
+}
+
+.scan-button:active {
+    transform: scale(.99);
+}
+
+.scan-button:disabled {
+    opacity: .55;
+    cursor: wait;
+    transform: none;
+}
+
+/* ========================= STATUS ========================= */
+
+.status {
+    margin-top: 10px;
+    padding: 8px 10px;
+    text-align: center;
+    color: #8d96a8;
+    font-size: 10px;
+    line-height: 1.4;
+}
+
+.status.scanning {
+    color: #a5b4fc;
+}
+
+.status.success {
+    color: #86efac;
+}
+
+.status.error {
+    color: #fca5a5;
+}
+
+/* ========================= SECTIONS ========================= */
+
+.section {
+    margin-top: 13px;
+}
+
+.section-title {
+    margin: 0 0 8px;
+    color: #9ba4b5;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: .9px;
+}
+
+/* ========================= PRODUCT ========================= */
+
+.product-card {
+    position: relative;
+    padding: 13px;
+    background: linear-gradient(145deg, #111722, #0d121b);
+    border: 1px solid #202838;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.product-card::after {
+    content: "";
+    position: absolute;
+    width: 90px;
+    height: 90px;
+    right: -35px;
+    top: -40px;
+    border-radius: 50%;
+    background: rgba(99,102,241,.10);
+}
+
+.product-platform {
+    color: #8d96a8;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: .8px;
+}
+
+.product-rating {
+    margin-top: 5px;
+    font-size: 20px;
+    font-weight: 800;
+}
+
+.product-ratings-count {
+    margin-top: 3px;
+    color: #727c8e;
+    font-size: 10px;
+}
+
+/* ========================= SUMMARY ========================= */
+
+.summary-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 6px;
+}
+
+.summary-card {
+    min-width: 0;
+    padding: 9px 4px;
+    text-align: center;
+    background: #111722;
+    border: 1px solid #202838;
+    border-radius: 9px;
+}
+
+.summary-number {
+    color: #f5f7fb;
+    font-size: 17px;
+    font-weight: 800;
+}
+
+.summary-label {
+    margin-top: 3px;
+    color: #727c8e;
+    font-size: 8px;
+}
+
+/* ========================= PURCHASE INSIGHT ========================= */
+
+.purchase-insight {
+    padding: 14px;
+    background: linear-gradient(145deg, #111722, #0d121b);
+    border: 1px solid #252d3d;
+    border-radius: 13px;
+}
+
+.purchase-title {
+    color: #8d96a8;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: .9px;
+}
+
+.purchase-score {
+    margin-top: 8px;
+    color: #f5f7fb;
+    font-size: 38px;
+    line-height: 1;
+    font-weight: 900;
+}
+
+.purchase-score span {
+    color: #667085;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.purchase-result {
+    margin-top: 6px;
+    color: #a5b4fc;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.purchase-description {
+    margin-top: 5px;
+    color: #8993a5;
+    font-size: 9px;
+    line-height: 1.5;
+}
+
+.purchase-metrics {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+    margin-top: 12px;
+}
+
+.purchase-metrics > div {
+    padding: 8px 5px;
+    text-align: center;
+    background: #090d14;
+    border-radius: 8px;
+}
+
+.purchase-metrics strong {
+    display: block;
+    font-size: 12px;
+}
+
+.purchase-metrics span {
+    display: block;
+    margin-top: 3px;
+    color: #687386;
+    font-size: 8px;
+}
+
+.purchase-note {
+    margin-top: 9px;
+    padding-top: 8px;
+    border-top: 1px solid #202838;
+    color: #687386;
+    font-size: 8px;
+}
+
+/* ========================= CUSTOMERS SAY ========================= */
+
+.customers-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 7px;
+}
+
+.customer-card {
+    min-height: 88px;
+    padding: 10px;
+    background: #111722;
+    border: 1px solid #202838;
+    border-radius: 10px;
+}
+
+.customer-topic {
+    color: #e7eaf0;
+    font-size: 11px;
+    font-weight: 750;
+}
+
+.customer-summary {
+    margin-top: 5px;
+    color: #8993a5;
+    font-size: 9px;
+    line-height: 1.35;
+}
+
+.positive-chip,
+.negative-chip {
+    display: inline-block;
+    margin-top: 6px;
+    margin-right: 3px;
+    padding: 3px 5px;
+    border-radius: 5px;
+    font-size: 7px;
+    font-weight: 700;
+}
+
+.positive-chip {
+    background: #14251d;
+    color: #86efac;
+}
+
+.negative-chip {
+    background: #2a181b;
+    color: #fca5a5;
+}
+
+/* ========================= REVIEWS ========================= */
+
+.review-card {
+    margin-top: 9px;
+    padding: 12px;
+    background: #111722;
+    border: 1px solid #202838;
+    border-radius: 11px;
+}
+
+.review-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.review-number {
+    color: #8d96a8;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: .7px;
+}
+
+.risk-badge {
+    padding: 4px 7px;
+    border-radius: 5px;
+    font-size: 7px;
+    font-weight: 800;
+    letter-spacing: .4px;
+}
+
+.risk-high {
+    background: #351a20;
+    color: #fca5a5;
+}
+
+.risk-medium {
+    background: #332a14;
+    color: #fcd34d;
+}
+
+.risk-low {
+    background: #14271d;
+    color: #86efac;
+}
+
+.review-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    margin-top: 7px;
+    color: #737d90;
+    font-size: 8px;
+}
+
+.verified {
+    color: #86efac;
+}
+
+.review-text {
+    margin-top: 9px;
+    color: #e7eaf0;
+    font-size: 11px;
+    line-height: 1.5;
+}
+
+.classification-row {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px;
+    margin-top: 10px;
+}
+
+.classification {
+    padding: 7px;
+    background: #090d14;
+    border-radius: 7px;
+}
+
+.classification span {
+    display: block;
+    color: #687386;
+    font-size: 7px;
+    font-weight: 700;
+    letter-spacing: .6px;
+}
+
+.classification strong {
+    display: block;
+    margin-top: 3px;
+    color: #e7eaf0;
+    font-size: 9px;
+}
+
+/* ========================= PROBABILITIES ========================= */
+
+.probability-section {
+    margin-top: 10px;
+}
+
+.probability-row {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 7px;
+    color: #8993a5;
+    font-size: 9px;
+}
+
+.probability-row strong {
+    color: #e7eaf0;
+}
+
+.probability-bar {
+    width: 100%;
+    height: 5px;
+    margin-top: 4px;
+    background: #202838;
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+.probability-fill {
+    height: 100%;
+    border-radius: 20px;
+    transition: width .35s ease;
+}
+
+.ai-fill {
+    background: linear-gradient(90deg, #6366f1, #8b5cf6);
+}
+
+.spam-fill {
+    background: linear-gradient(90deg, #f59e0b, #ef4444);
+}
+
+/* ========================= ERROR ========================= */
+
+.error-box {
+    margin-top: 12px;
+    padding: 13px;
+    background: #1a1216;
+    border: 1px solid #4a242d;
+    border-radius: 10px;
+    color: #fca5a5;
+    font-size: 11px;
+    line-height: 1.5;
+}
+
+.error-box strong {
+    color: #fecaca;
+    font-size: 12px;
+}
+
+.error-box p {
+    margin: 6px 0;
+}
+
+.error-box small {
+    color: #9b7b82;
+}
+
+/* ========================= SCROLL ========================= */
+
+#results {
+    padding-bottom: 22px;
+}
+
+::-webkit-scrollbar {
+    width: 5px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #293244;
+    border-radius: 10px;
+}

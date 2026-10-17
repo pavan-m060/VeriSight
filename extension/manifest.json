@@ -1,0 +1,39 @@
+{
+    "manifest_version": 3,
+    "name": "VeriSight",
+    "version": "1.0.0",
+    "description": "AI and spam review security scanner",
+
+    "permissions": [
+        "activeTab",
+        "tabs",
+        "sidePanel"
+    ],
+
+    "host_permissions": [
+        "http://127.0.0.1:8000/*",
+        "https://*.amazon.in/*",
+        "https://*.amazon.com/*",
+        "https://*.flipkart.com/*",
+        "https://*.myntra.com/*",
+        "https://*.meesho.com/*",
+        "https://*.shopsy.in/*",
+        "https://*.ajio.com/*",
+        "https://*.nykaa.com/*",
+        "https://*.zeptonow.com/*",
+        "https://*.swiggy.com/*"
+    ],
+
+    "action": {
+        "default_popup": "popup.html",
+        "default_title": "VeriSight"
+    },
+
+    "background": {
+        "service_worker": "background.js"
+    },
+
+    "side_panel": {
+        "default_path": "sidepanel.html"
+    }
+}

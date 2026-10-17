@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>VeriSight</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div class="container">
+
+        <!-- HEADER -->
+        <div class="header">
+
+            <div class="logo-box">
+                V
+            </div>
+
+            <div class="header-text">
+                <h1>VeriSight</h1>
+                <p>Review Security Scanner</p>
+            </div>
+
+        </div>
+
+
+        <!-- SCAN BUTTON -->
+        <button
+            id="scanButton"
+            class="scan-button"
+            type="button"
+        >
+            <span>Scan This Page</span>
+        </button>
+
+
+        <!-- STATUS -->
+        <div
+            id="status"
+            class="status"
+        >
+            Open a product page and click Scan This Page.
+        </div>
+
+
+        <!-- RESULTS -->
+        <div
+            id="results"
+            class="results"
+        >
+        </div>
+
+    </div>
+
+
+    <!-- IMPORTANT:
+         popup.js is loaded AFTER the HTML elements exist.
+    -->
+    <script src="popup.js"></script>
+
+</body>
+</html>
